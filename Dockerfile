@@ -1,29 +1,28 @@
-# Usa una imagen de Java oficial con versión compatible con tu proyecto
-FROM eclipse-temurin:17-jdk-jammy as builder
+# Fase de construcción con JDK
+FROM maven:3.8.6-eclipse-temurin-17 as builder
 
-# Directorio de trabajo en el contenedor
+# Configuración del directorio de trabajo
 WORKDIR /app
 
-# Copia los archivos de construcción (pom.xml, gradle, etc.)
-COPY gradlew .
-COPY gradle gradle
-COPY build.gradle .
-COPY settings.gradle .
+# Copia los archivos necesarios para la construcción
+COPY pom.xml .
 COPY src src
 
-# Ejecuta la construcción (ajusta según tu sistema de construcción)
-RUN chmod +x gradlew
-RUN ./gradlew bootJar
+# Descarga las dependencias (se cachean si el pom.xml no cambia)
+RUN mvn dependency:go-offline
 
-# Segunda etapa: imagen de producción más ligera
+# Construye el proyecto
+RUN mvn clean package -DskipTests
+
+# Fase de ejecución (imagen más ligera con solo JRE)
 FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
-# Copia el JAR construido desde la etapa anterior
-COPY --from=builder /app/build/libs/*.jar app.jar
+# Copia el JAR construido desde la fase de construcción
+COPY --from=builder /app/target/*.jar app.jar
 
-# Puerto que expone la aplicación (ajusta al puerto que usa tu Spring Boot)
+# Puerto que expone la aplicación (ajusta según tu aplicación)
 EXPOSE 8080
 
 # Comando para ejecutar la aplicación
