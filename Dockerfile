@@ -1,14 +1,30 @@
-# 1. Imagen base de Java
-FROM openjdk:17-jdk-slim
+# Usa una imagen de Java oficial con versión compatible con tu proyecto
+FROM eclipse-temurin:17-jdk-jammy as builder
 
-# 2. Directorio de trabajo
+# Directorio de trabajo en el contenedor
 WORKDIR /app
 
-# 3. Copiar el JAR generado
-COPY target/springboot-plantilla-0.0.1-SNAPSHOT.jar app.jar
+# Copia los archivos de construcción (pom.xml, gradle, etc.)
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+COPY src src
 
-# 4. Puerto que expondrá la app
+# Ejecuta la construcción (ajusta según tu sistema de construcción)
+RUN chmod +x gradlew
+RUN ./gradlew bootJar
+
+# Segunda etapa: imagen de producción más ligera
+FROM eclipse-temurin:17-jre-jammy
+
+WORKDIR /app
+
+# Copia el JAR construido desde la etapa anterior
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+# Puerto que expone la aplicación (ajusta al puerto que usa tu Spring Boot)
 EXPOSE 8080
 
-# 5. Comando para ejecutar la app
-ENTRYPOINT ["java","-jar","app.jar"]
+# Comando para ejecutar la aplicación
+ENTRYPOINT ["java", "-jar", "app.jar"]
