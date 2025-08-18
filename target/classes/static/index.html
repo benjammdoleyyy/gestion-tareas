@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Tareas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1><i class="fas fa-tasks"></i> Gestor de Tareas</h1>
+        <p>Administra tus tareas de manera eficiente</p>
+    </header>
+
+    <div class="main-content">
+        <div class="form-container">
+            <h2><i class="fas fa-plus-circle"></i> Nueva Tarea</h2>
+            <form id="tareaForm">
+                <div class="form-group">
+                    <label for="titulo">Título:</label>
+                    <input type="text" id="titulo" required>
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripción:</label>
+                    <textarea id="descripcion" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar Tarea
+                </button>
+            </form>
+        </div>
+
+        <div class="tareas-container">
+            <div class="filtros">
+                <h2><i class="fas fa-filter"></i> Filtros</h2>
+                <div class="filtros-options">
+                    <button id="btnTodas" class="btn btn-filter active">Todas</button>
+                    <button id="btnPendientes" class="btn btn-filter">Pendientes</button>
+                    <button id="btnCompletadas" class="btn btn-filter">Completadas</button>
+                </div>
+            </div>
+
+            <div class="tareas-list">
+                <h2><i class="fas fa-list"></i> Lista de Tareas</h2>
+                <div id="listaTareas">
+                    <!-- Las tareas se cargarán aquí dinámicamente -->
+                    <!-- Ejemplo de estructura de una tarea: -->
+                    <div class="tarea-item">
+                        <div class="tarea-header">
+                            <h3 class="tarea-title">Título de la tarea</h3>
+                            <span class="tarea-fecha">Creada: 15 de julio de 2023, 14:30</span>
+                        </div>
+                        <p class="tarea-descripcion">Descripción de la tarea...</p>
+                        <div class="tarea-actions">
+                            <button class="tarea-btn btn-edit" data-id="1">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="tarea-btn btn-complete" data-id="1">
+                                <i class="fas fa-check"></i> Completar
+                            </button>
+                            <button class="tarea-btn btn-delete" data-id="1">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar tarea -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2><i class="fas fa-edit"></i> Editar Tarea</h2>
+        <form id="editForm">
+            <input type="hidden" id="editId">
+            <div class="form-group">
+                <label for="editTitulo">Título:</label>
+                <input type="text" id="editTitulo" required>
+            </div>
+            <div class="form-group">
+                <label for="editDescripcion">Descripción:</label>
+                <textarea id="editDescripcion" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="editCompletada">
+                    <input type="checkbox" id="editCompletada"> Completada
+                </label>
+            </div>
+            <div class="form-group">
+                <label>Fecha de creación:</label>
+                <p id="editFechaCreacion" class="fecha-creacion"></p>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+        </form>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
