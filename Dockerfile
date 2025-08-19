@@ -1,27 +1,9 @@
-# Fase de construcción
-FROM maven:3.8.6-eclipse-temurin-17 as builder
+FROM eclipse-temurin:21-jdk-jammy
 
-WORKDIR /app
-COPY pom.xml .
-COPY src src
+WORKDIR /home/app
 
-# Cache de dependencias
-RUN mvn dependency:go-offline
+COPY . /home/app
 
-# Construcción del proyecto
-RUN mvn clean package -DskipTests
+EXPOSE 3690
 
-# Fase de ejecución
-FROM eclipse-temurin:17-jre-jammy
-
-WORKDIR /app
-COPY --from=builder /app/target/*.jar app.jar
-
-# Puerto para Render
-EXPOSE 10000
-
-# Health check para Render
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:${PORT:-10000}/actuator/health || exit 1
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "/home/app/app.jar"]
