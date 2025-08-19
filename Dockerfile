@@ -1,29 +1,27 @@
-# Fase de construcción con JDK
+# Fase de construcción
 FROM maven:3.8.6-eclipse-temurin-17 as builder
 
-# Configuración del directorio de trabajo
 WORKDIR /app
-
-# Copia los archivos necesarios para la construcción
 COPY pom.xml .
 COPY src src
 
-# Descarga las dependencias (se cachean si el pom.xml no cambia)
+# Cache de dependencias
 RUN mvn dependency:go-offline
 
-# Construye el proyecto
+# Construcción del proyecto
 RUN mvn clean package -DskipTests
 
-# Fase de ejecución (imagen más ligera con solo JRE)
+# Fase de ejecución
 FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
-
-# Copia el JAR construido desde la fase de construcción
 COPY --from=builder /app/target/*.jar app.jar
 
-# Puerto que expone la aplicación (ajusta según tu aplicación)
-EXPOSE 8080
+# Puerto para Render
+EXPOSE 10000
 
-# Comando para ejecutar la aplicación
+# Health check para Render
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:${PORT:-10000}/actuator/health || exit 1
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
